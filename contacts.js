@@ -1,5 +1,4 @@
 const fs = require("fs").promises;
-const { log } = require("console");
 const path = require("path");
 const { nanoid } = require("nanoid");
 const contactsPath = path.resolve("./contacts.json");
@@ -11,34 +10,52 @@ module.exports = {
 };
 
 async function listContacts() {
-  const dbRaw = await fs.readFile(contactsPath);
-  const db = JSON.parse(dbRaw);
+  try {
+    const dbRaw = await fs.readFile(contactsPath);
+    const db = JSON.parse(dbRaw);
 
-  return db;
+    return db;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function getContactById(contactId) {
-  const db = await listContacts();
-  const contact = db.find((item) => item.id === contactId);
-  if (!contact) {
-    return null;
+  try {
+    const db = await listContacts();
+    const contact = db.find((item) => item.id === contactId);
+    if (!contact) {
+      return `Contact with id = ${contactId} not found`;
+    }
+    return contact;
+  } catch (error) {
+    console.log(error);
   }
-  return contact;
 }
 
 async function removeContact(contactId) {
-  const db = await listContacts();
-  const contacts = db.filter((item) => item.id !== contactId);
+  try {
+    const db = await listContacts();
+    const contacts = db.findIndex((item) => item.id === contactId);
 
-  fs.writeFile(contactsPath, JSON.stringify(contacts));
-  return contacts;
+    if (contacts === -1) return `Contact with id = ${contactId} not found`;
+    const removeContact = db.splice(contacts, 1);
+    await fs.writeFile(contactsPath, JSON.stringify(db));
+    return removeContact;
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 async function addContact(name, email, phone) {
-  const db = await listContacts();
-  const id = nanoid();
-  const contact = { id, name, email, phone };
-  db.push(contact);
-  fs.writeFile(contactsPath, JSON.stringify(db));
-  return db;
+  try {
+    const db = await listContacts();
+    const id = nanoid();
+    const contact = { id, name, email, phone };
+    db.push(contact);
+    fs.writeFile(contactsPath, JSON.stringify(db));
+    return db;
+  } catch (e) {
+    console.log(e);
+  }
 }

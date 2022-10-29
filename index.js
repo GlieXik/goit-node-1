@@ -2,11 +2,6 @@ const contacts = require("./contacts");
 
 const { Command } = require("commander");
 
-// contacts.listContacts();
-// contacts.getContactById(6);
-// contacts.removeContact("6");
-// contacts.addContact("name", "email", "phone");
-
 const program = new Command();
 program
   .option("-a, --action <type>", "choose action")
